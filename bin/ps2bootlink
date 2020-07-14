@@ -11,9 +11,8 @@ exec 3<>"$PIPE"
 rm "$PIPE"
 
 listen_thread() {
-	ps2client -t 20 listen >&3
-	kill $GREPPID
-	exec 3>&-
+	ps2client -t 10 listen >&3
+	return 1
 }
 
 listen_thread &
@@ -22,16 +21,18 @@ PS2CLIENTPID=$(jobs -p %+)
 grep -m 1 'EE: Cmd thread' <&3 &
 GREPPID=$(jobs -p %+)
 
-if wait $GREPPID; then
+if wait -n; then
 	echo "PS2 has booted into PS2Link! Woop woop"
+	kill $GREPPID
 	kill $PS2CLIENTPID
-	exec 3>&-
 	exit 0
 else
-	echo "PS2 didn't start :|"
+	echo "PS2 hasn't booted into PS2Link in 10 seconds, shutting it down."
+	kill $GREPPID
 	kill $PS2CLIENTPID
-	exec 3>&-
-	echo "shutting down PS2"
 	ps2poweroff
 	exit 1
 fi
+
+echo "Something weird has happened!"
+exit 2
