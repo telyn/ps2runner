@@ -17,9 +17,9 @@ Usage
 ```console
 # to turn on your slim PS2:
 docker run --rm --device /dev/ttyACM0 telyn/ps2runner ps2poweron
-# to turn on your slim PS2 & boot into PS2Link:
-# TODO: ps2bootlink should wait until `ps2client listen` reports that ps2link is ready ("EE: Cmd thread" appears)
-docker run --rm --device /dev/ttyACM0 telyn/ps2runner ps2bootlink
+# to turn on your slim PS2 & boot into PS2Link. --network=host is needed to get
+# PS2Link's bootup broadcast messages to show up in the container
+docker run --rm --network=host --device /dev/ttyACM0 telyn/ps2runner ps2bootlink
 # to turn off your slim PS2:
 docker run --rm --device /dev/ttyACM0 telyn/ps2runner ps2poweroff
 ```
