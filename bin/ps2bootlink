@@ -1,6 +1,30 @@
-#!/bin/sh
+#!/bin/bash
 
 ps2poweron
 irsend send_start ps2 L1
-sleep 15
+sleep 10
 irsend send_stop ps2 L1
+
+PIPE=$(mktemp -u)
+mkfifo "$PIPE"
+exec 3<>"$PIPE"
+rm "$PIPE"
+
+listen_thread() {
+	ps2client -t 20 listen >&3; exec 3>&-
+}
+
+listen_thread &
+PS2CLIENTPID=$(jobs -p %+)
+
+if grep -m 1 'EE: Cmd thread' <&3; then
+	echo "PS2 has booted into PS2Link! Woop woop"
+	kill $PS2CLIENTPID
+	exec 3>&-
+	exit 0
+else
+	echo "PS2 didn't start :|"
+	kill $PS2CLIENTPID
+	exec 3>&-
+	exit 1
+fi
