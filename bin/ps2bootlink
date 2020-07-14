@@ -26,5 +26,7 @@ else
 	echo "PS2 didn't start :|"
 	kill $PS2CLIENTPID
 	exec 3>&-
+	echo "shutting down PS2"
+	ps2poweroff
 	exit 1
 fi
