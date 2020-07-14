@@ -1,0 +1,6 @@
+#!/bin/sh
+
+ps2poweron
+irsend send_start ps2 L1
+sleep 15
+irsend send_stop ps2 L1

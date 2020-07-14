@@ -1,0 +1,3 @@
+#!/bin/sh
+
+irsend --count=10 send_once ps2 reset
