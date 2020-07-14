@@ -21,9 +21,12 @@ ENV PS2DEV /usr/local/ps2dev
 ENV PATH $PATH:$PS2DEV/bin
 
 COPY lirc/ /etc/lirc/
-COPY bin/ps2bootlink bin/ps2poweron bin/ps2poweroff /usr/bin/
 
 RUN apt update \
  && apt -o Dpkg::Options::=--force-confold install -y lirc
 
 COPY --from=builder $PS2DEV $PS2DEV
+COPY bin/ps2bootlink bin/ps2poweron bin/ps2poweroff /usr/bin/
+COPY entrypoint.sh /entrypoint.sh
+ENTRYPOINT [ "/entrypoint.sh" ]
+CMD [ "/usr/bin/ps2bootlink" ]
