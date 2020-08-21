@@ -1,4 +1,4 @@
-name: build for arm and the other one
+name: build and push docker image
 
 on:
   push:
