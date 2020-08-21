@@ -1,6 +1,8 @@
 #!/bin/bash
 
 ps2poweron
+
+# hold down L1 for 10 seconds
 irsend send_start ps2 L1
 sleep 10
 irsend send_stop ps2 L1
