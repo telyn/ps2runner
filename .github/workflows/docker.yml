@@ -16,7 +16,7 @@ jobs:
         with:
           buildx-version: latest
       - name: docker login
-        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login --username "${{ secrets.DOCKER_USER }}" --password-stdin
+        run: echo "${{ secrets.DOCKER_PASS }}" | docker login --username "${{ secrets.DOCKER_USER }}" --password-stdin
       - name: build image
         run: |
           docker buildx build --push \
