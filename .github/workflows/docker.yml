@@ -1,0 +1,24 @@
+name: build for arm and the other one
+
+on:
+  push:
+    branches: master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+      - name: install buildx
+        id: buildx
+        uses: crazy-max/ghaction-docker-buildx@v1
+        with:
+          version: latest
+      - name: docker login
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login "${{ secrets.DOCKER_USER }}" --password-stdin
+      - name: build image
+        run: |
+          docker buildx build --push \
+            --tag $DOCKER_USER/ps2runner:latest \
+            --platform linux/amd64,linux/arm/v7,linux/arm64 .
