@@ -13,7 +13,7 @@ exec 3<>"$PIPE"
 rm "$PIPE"
 
 listen_thread() {
-	ps2client -t 10 listen > >(tee >&3 /dev/stderr)
+	ps2client -t 10 listen > >(tee >&3 /dev/stdout)
 	return 1
 }
 

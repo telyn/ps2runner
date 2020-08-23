@@ -54,7 +54,7 @@ parse_exit_code_thread() {
     if [ "$MODE" = "IOP" ]; then
 	PREFIX="'loadmodule: id [[:digit:]]*,"
     fi
-    GREPRES=$(grep -m 1 -E "$PREFIX"' ret [[:digit:]]+$' <&3 >/dev/null)
+    GREPRES=$(grep -m 1 -E "$PREFIX"' ret [[:digit:]]+$' <&3)
 }
 
 listen_thread &
