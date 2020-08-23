@@ -32,7 +32,7 @@ if [ -z "$TIMEOUT" ]; then
     TIMEOUT=10
 fi
 
-pushd $(dirname "$@")
+pushd "$(dirname "$@")"
 
 FILE=$(basename "$@")
 
@@ -42,7 +42,7 @@ mkfifo "$PIPE"
 exec 3<>"$PIPE"
 rm "$PIPE"
 
-ps2client -t "5" netdump
+ps2client -t "1" netdump
 
 listen_thread() {
     ps2client -t "$TIMEOUT" "exec$MODE" "host:$FILE" > >(tee >&3 /dev/stderr)
@@ -66,7 +66,7 @@ if wait -n; then
 	echo ""
 	kill $GREPPID
 	kill $PS2CLIENTPID
-	EXITCODE=$(echo "$GREPRES" | grep -E -o ' ret [[:digit:]]+$' | awk '{print $3}')
+	EXITCODE=$(echo "$GREPRES" | grep -E -o ' ret [[:digit:]]+$' | awk '{print $2}')
 	exit $EXITCODE
 else
     echo "Command didn't finish within the timeout."
