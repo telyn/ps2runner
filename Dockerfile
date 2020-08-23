@@ -26,7 +26,7 @@ RUN apt update \
  && apt -o Dpkg::Options::=--force-confold install -y lirc
 
 COPY --from=builder $PS2DEV $PS2DEV
-COPY bin/ps2bootlink bin/ps2poweron bin/ps2poweroff /usr/bin/
+COPY bin/ps2bootlink bin/ps2poweron bin/ps2poweroff bin/ps2run /usr/bin/
 COPY entrypoint.sh /entrypoint.sh
 ENTRYPOINT [ "/entrypoint.sh" ]
 CMD [ "/usr/bin/ps2bootlink" ]

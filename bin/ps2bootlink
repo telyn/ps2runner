@@ -13,14 +13,14 @@ exec 3<>"$PIPE"
 rm "$PIPE"
 
 listen_thread() {
-	ps2client -t 10 listen >&3
+	ps2client -t 10 listen > >(tee >&3 /dev/stderr)
 	return 1
 }
 
 listen_thread &
 PS2CLIENTPID=$(jobs -p %+)
 
-grep -m 1 'EE: Cmd thread' <&3 &
+grep -m 1 'EE: Cmd thread' <&3 >/dev/null &
 GREPPID=$(jobs -p %+)
 
 if wait -n; then

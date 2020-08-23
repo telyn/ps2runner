@@ -1,0 +1,78 @@
+#!/bin/bash
+set -x
+
+OPT=$1
+if [ "$OPT" == "--ee" ]; then
+    MODE=ee
+elif [ "$OPT" == "--iop" ]; then
+    MODE=iop
+else
+    cat <<USAGE
+usage: ps2run ( --ee | --iop ) [ -t TIMEOUT ] <program>
+
+executes a program on the PS2 and returns the error code returned by
+its main function (if supported). If the program does not complete
+within TIMEOUT seconds (default 10), ps2run will exit with code 126.
+
+ps2run uses ps2client internally, so ensure that the PS2HOSTNAME variable is
+exported and correct, and that ps2link is already booted (perhaps use
+ps2bootlink)
+
+Note: for EE programs only, in order for the return code detection to work,
+      the program must have been compiled with the following LDFLAGS:
+        -Wl,--wrap=_start -lps2run_start
+USAGE
+    exit 1;
+fi
+
+shift
+
+# TIMEOUT=$2
+if [ -z "$TIMEOUT" ]; then
+    TIMEOUT=10
+fi
+
+pushd $(dirname "$@")
+
+FILE=$(basename "$@")
+
+# setup a fifo in PIPE, read/writable as fd 3
+PIPE=$(mktemp -u)
+mkfifo "$PIPE"
+exec 3<>"$PIPE"
+rm "$PIPE"
+
+ps2client -t "5" netdump
+
+listen_thread() {
+    ps2client -t "$TIMEOUT" "exec$MODE" "host:$FILE" > >(tee >&3 /dev/stderr)
+    return 1
+}
+
+parse_exit_code_thread() {
+    PREFIX="libps2run"
+    if [ "$MODE" = "IOP" ]; then
+	PREFIX="'loadmodule: id [[:digit:]]*,"
+    fi
+    GREPRES=$(grep -m 1 -E "$PREFIX"' ret [[:digit:]]+$' <&3 >/dev/null)
+}
+
+listen_thread &
+PS2CLIENTPID=$(jobs -p %+)
+parse_exit_code_thread &
+GREPPID=$(jobs -p %+)
+popd
+if wait -n; then
+	echo ""
+	kill $GREPPID
+	kill $PS2CLIENTPID
+	EXITCODE=$(echo "$GREPRES" | grep -E -o ' ret [[:digit:]]+$' | awk '{print $3}')
+	exit $EXITCODE
+else
+    echo "Command didn't finish within the timeout."
+    kill $GREPPID
+    kill $PS2CLIENTPID
+    exit 126
+fi
+echo "Something weird has happened!"
+exit 2
