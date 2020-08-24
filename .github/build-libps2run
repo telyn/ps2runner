@@ -1,5 +1,0 @@
-#!/bin/sh
-set -ex
-
-cd libps2run
-make
