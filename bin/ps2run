@@ -66,7 +66,8 @@ parse_exit_code() {
 
 listen_thread &
 PS2CLIENTPID=$(jobs -p %+)
-EXITCODE=$(parse_exit_code)
+parse_exit_code
+EXITCODE=$?
 popd
 if [ "$EXITCODE" != "127" ]; then
 	echo ""
