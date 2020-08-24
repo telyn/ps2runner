@@ -46,32 +46,32 @@ ps2client -t "1" netdump
 
 listen_thread() {
     ps2client -t "$TIMEOUT" "exec$MODE" "host:$FILE" > >(tee >&3 /dev/stderr)
+    # close 3, should cause parse_exit_code_thread to exit
+    exec 3>&-
     return 1
 }
 
-parse_exit_code_thread() {
+parse_exit_code() {
     PREFIX="libps2run"
     if [ "$MODE" = "IOP" ]; then
 	PREFIX="'loadmodule: id [[:digit:]]*,"
     fi
+
     GREPRES=$(grep -m 1 -E "$PREFIX"' ret [[:digit:]]+$' <&3)
+    EXITCODE=$(echo "$GREPRES" | grep -E -o ' ret [[:digit:]]+$' | awk '{print $2}')
+    [ -n "$EXITCODE" ] && exit $EXITCODE
+    exit 127
 }
 
 listen_thread &
 PS2CLIENTPID=$(jobs -p %+)
-parse_exit_code_thread &
-GREPPID=$(jobs -p %+)
+EXITCODE=$(parse_exit_code)
 popd
-if wait -n; then
+if [ "$EXITCODE" != "127" ]; then
 	echo ""
-	kill $GREPPID
-	kill $PS2CLIENTPID
-	EXITCODE=$(echo "$GREPRES" | grep -E -o ' ret [[:digit:]]+$' | awk '{print $2}')
 	exit $EXITCODE
 else
     echo "Command didn't finish within the timeout."
-    kill $GREPPID
-    kill $PS2CLIENTPID
     exit 126
 fi
 echo "Something weird has happened!"
