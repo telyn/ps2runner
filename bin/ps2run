@@ -52,6 +52,7 @@ listen_thread() {
 }
 
 parse_exit_code() {
+    local $EXITCODE
     PREFIX="libps2run"
     if [ "$MODE" = "IOP" ]; then
 	PREFIX="'loadmodule: id [[:digit:]]*,"
@@ -59,8 +60,8 @@ parse_exit_code() {
 
     GREPRES=$(grep -m 1 -E "$PREFIX"' ret [[:digit:]]+$' <&3)
     EXITCODE=$(echo "$GREPRES" | grep -E -o ' ret [[:digit:]]+$' | awk '{print $2}')
-    [ -n "$EXITCODE" ] && exit $EXITCODE
-    exit 127
+    [ -n "$EXITCODE" ] && return $EXITCODE
+    return 127
 }
 
 listen_thread &
