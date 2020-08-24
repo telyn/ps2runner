@@ -12,6 +12,8 @@ jobs:
       image: ps2dev/ps2dev
     steps:
     - uses: actions/checkout@master
+    - name: Install make (seriously ps2dev??)
+      run: apk install -u make
     - name: Build libps2run.a
       run: cd libps2run && make
     - name: Create Release
