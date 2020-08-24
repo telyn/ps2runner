@@ -13,7 +13,7 @@ jobs:
     steps:
     - uses: actions/checkout@master
     - name: Install make (seriously ps2dev??)
-      run: apk install -u make
+      run: apk add -u make
     - name: Build libps2run.a
       run: cd libps2run && make
     - name: Create Release
