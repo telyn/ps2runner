@@ -34,4 +34,3 @@ jobs:
         asset_path: libps2run/libps2run.a
         asset_name: libps2run.a
         asset_content_type: application/x-archive
-       args: 'libps2run/libps2run.a'
