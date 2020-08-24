@@ -23,9 +23,12 @@ ENV PATH $PATH:$PS2DEV/bin
 COPY lirc/ /etc/lirc/
 
 RUN apt update \
- && apt -o Dpkg::Options::=--force-confold install -y lirc
+ && apt -o Dpkg::Options::=--force-confold install -y \
+   lirc \
+   wget \
+   git
 
-COPY --from=builder $PS2DEV $PS2DEV
+COPY --from=ps2dev/ps2dev /usr/local/ps2dev/ps2sdk/iop/irx/ /irx/
 COPY bin/ps2bootlink bin/ps2poweron bin/ps2poweroff bin/ps2run /usr/bin/
 COPY entrypoint.sh /entrypoint.sh
 ENTRYPOINT [ "/entrypoint.sh" ]
