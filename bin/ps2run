@@ -1,12 +1,5 @@
-#!/bin/bash
-set -x
-
-OPT=$1
-if [ "$OPT" == "--ee" ]; then
-    MODE=ee
-elif [ "$OPT" == "--iop" ]; then
-    MODE=iop
-else
+#!/usr/local/bin/bash
+usage() {
     cat <<USAGE
 usage: ps2run ( --ee | --iop ) [ -t TIMEOUT ] <program>
 
@@ -23,14 +16,39 @@ Note: for EE programs only, in order for the return code detection to work,
         -Wl,--wrap=_start -lps2run_start
 USAGE
     exit 1;
+}
+
+OPT=$1
+if [ "$OPT" == "--ee" ]; then
+    MODE=ee
+elif [ "$OPT" == "--iop" ]; then
+    MODE=iop
+else
+    usage
 fi
 
 shift
+
+while getopts "t:" option; do
+    case "$option" in
+	t)
+	    case "$OPTARG" in
+		''|*[!0-9]*) echo "error: TIMEOUT must be an integer"; echo; usage ;;
+		*) TIMEOUT=$OPTARG ;;
+	    esac
+	    ;;
+    esac
+done
+shift $((OPTIND-1))
+if [ $# = 0 ]; then
+    usage
+fi
 
 # TIMEOUT=$2
 if [ -z "$TIMEOUT" ]; then
     TIMEOUT=10
 fi
+echo "Using a $TIMEOUT second timeout"
 
 pushd "$(dirname "$@")"
 
