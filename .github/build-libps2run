@@ -1,0 +1,5 @@
+#!/bin/sh
+set -exo pipefail
+
+cd libps2run
+make
