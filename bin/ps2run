@@ -46,30 +46,33 @@ ps2client -t "1" netdump
 
 listen_thread() {
     ps2client -t "$TIMEOUT" "exec$MODE" "host:$FILE" > >(tee >&3 /dev/stderr)
-    # close 3, should cause parse_exit_code_thread to exit
-    exec 3>&-
+    # do something to make parse_exit_code return
+    kill $GREPPID
     return 1
 }
 
 parse_exit_code() {
     local $EXITCODE
     PREFIX="libps2run"
-    if [ "$MODE" = "IOP" ]; then
-	PREFIX="'loadmodule: id [[:digit:]]*,"
+    if [ "$MODE" = "iop" ]; then
+	PREFIX="loadmodule: id [[:digit:]]+,"
     fi
 
-    GREPRES=$(grep -m 1 -E "$PREFIX"' ret [[:digit:]]+$' <&3)
-    EXITCODE=$(echo "$GREPRES" | grep -E -o ' ret [[:digit:]]+$' | awk '{print $2}')
+    GREPRES=$(grep -m 1 -E "$PREFIX"' ret [[:digit:]]+' <&3)
+    EXITCODE=$(echo "$GREPRES" | grep -E -o ' ret [[:digit:]]+' | awk '{print $2}')
     [ -n "$EXITCODE" ] && return $EXITCODE
     return 127
 }
 
+parse_exit_code &
+GREPPID=$(jobs -p %+)
 listen_thread &
 PS2CLIENTPID=$(jobs -p %+)
-parse_exit_code
+wait $GREPPID
 EXITCODE=$?
+killall ps2client
 popd
-if [ "$EXITCODE" != "127" ]; then
+if [ "$EXITCODE" != "143" ]; then
 	echo ""
 	exit $EXITCODE
 else
