@@ -27,6 +27,8 @@ if wait -n; then
 	echo "PS2 has booted into PS2Link! Woop woop"
 	kill $GREPPID
 	kill $PS2CLIENTPID
+	echo "Sleeping for a few seconds to let PS2Link finish starting"
+	sleep 3
 	exit 0
 else
 	echo "PS2 hasn't booted into PS2Link in 10 seconds, shutting it down."
