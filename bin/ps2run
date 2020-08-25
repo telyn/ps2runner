@@ -1,4 +1,4 @@
-#!/usr/local/bin/bash
+#!/bin/bash
 usage() {
     cat <<USAGE
 usage: ps2run ( --ee | --iop ) [ -t TIMEOUT ] <program>
