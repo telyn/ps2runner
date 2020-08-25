@@ -29,6 +29,7 @@ RUN apt update \
    git
 
 COPY --from=ps2dev/ps2dev /usr/local/ps2dev/ps2sdk/iop/irx/ /irx/
+COPY --from=builder $PS2DEV $PS2DEV
 COPY bin/ps2bootlink bin/ps2poweron bin/ps2poweroff bin/ps2run /usr/bin/
 COPY entrypoint.sh /entrypoint.sh
 ENTRYPOINT [ "/entrypoint.sh" ]
