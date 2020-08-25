@@ -50,6 +50,11 @@ if [ -z "$TIMEOUT" ]; then
 fi
 echo "Using a $TIMEOUT second timeout"
 
+if [ -f "$@" ]; then
+    echo "$@ does not exist - check your paths!"
+    exit 127
+fi
+
 pushd "$(dirname "$@")"
 
 FILE=$(basename "$@")
