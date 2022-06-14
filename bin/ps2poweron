@@ -1,3 +1,3 @@
 #!/bin/sh
 
-irsend --count=10 send_once ps2 reset
+irsend --count=10 send_once ps2 KEY_PS2_POWERON
